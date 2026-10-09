@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - ECCI Icononzo</title>
+    <style>
+        :root {
+            --color-background-primary: #ffffff;
+            --color-background-tertiary: #f5f7f9;
+            --color-text-primary: #1a1a1a;
+            --color-text-secondary: #666666;
+            --color-border-tertiary: #e1e4e8;
+            --border-radius-lg: 8px;
+            --border-radius-md: 4px;
+            --font-sans: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--color-background-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-card {
+            background: var(--color-background-primary);
+            border: 0.5px solid var(--color-border-tertiary);
+            border-radius: var(--border-radius-lg);
+            padding: 2.5rem 2rem;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+        }
+
+        .login-logo {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 500;
+            color: #185FA5;
+            margin-bottom: 2rem;
+        }
+
+        .login-logo span {
+            color: var(--color-text-secondary);
+            font-weight: 400;
+            display: block;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+        }
+
+        input {
+            padding: 8px 10px;
+            border: 0.5px solid #ccc;
+            border-radius: var(--border-radius-md);
+            font-size: 13px;
+        }
+
+        .btn.primary {
+            background: #185FA5;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        #login-error {
+            display: none;
+            text-align: center;
+            margin-bottom: 1rem;
+            padding: 8px;
+            border-radius: var(--border-radius-md);
+            background: #FCEBEB;
+            color: #791F1F;
+            border: 0.5px solid #F7C1C1;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <div class="login-logo">
+        ECCI 
+        <span>Plataforma Académica Institucional</span>
+    </div>
+    
+    <div id="login-error">Usuario o contraseña incorrectos.</div>
+
+    <form id="login-form">
+        <div class="form-group">
+            <label>Usuario</label>
+            <input type="text" id="login-user" required placeholder="Ej: maria.arias">
+        </div>
+        
+        <div class="form-group">
+            <label>Contraseña</label>
+            <input type="password" id="login-pass" required placeholder="••••••••">
+        </div>
+        
+        <button type="submit" class="btn primary">Iniciar sesión</button>
+    </form>
+</div>
+
+<script>
+    const USUARIOS_REGISTRADOS = {
+        "julian.alvarez": "123",
+        "santiago.lopez": "456",
+        "johan.avila": "789",
+        "admin": "admin2026"
+    };
+
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const user = document.getElementById('login-user').value;
+        const pass = document.getElementById('login-pass').value;
+        const errorMsg = document.getElementById('login-error');
+
+        if (USUARIOS_REGISTRADOS[user] === pass) {
+            // "Guardamos" la sesión en el navegador
+            localStorage.setItem('sesionIniciada', 'true');
+            localStorage.setItem('nombreUsuario', user);
+            
+            // Redirigimos al archivo de la plataforma
+            window.location.href = '/myapp/dashboard/';  // ✅ usa la ruta Django
+        } else {
+            errorMsg.style.display = 'block';
+        }
+    });
+</script>
+
+</body>
+</html>

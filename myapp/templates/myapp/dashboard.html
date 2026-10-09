@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Gráficas -->
+<div class="row mt-4">
+    <!-- Gráfica de línea - Ventas -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Ventas del mes</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="ventasChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfica de dona - Productos -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Productos más vendidos</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="productosChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Gráfica de línea - Ventas
+    const ctxVentas = document.getElementById('ventasChart').getContext('2d');
+    new Chart(ctxVentas, {
+        type: 'line',
+        data: {
+            labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'],
+            datasets: [{
+                label: 'Ventas ($)',
+                data: [1200, 2500, 1800, 3200],
+                borderColor: '#0d6efd',
+                backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' }
+            }
+        }
+    });
+
+    // Gráfica de dona - Productos
+    const ctxProductos = document.getElementById('productosChart').getContext('2d');
+    new Chart(ctxProductos, {
+        type: 'doughnut',
+        data: {
+            labels: ['Laptop', 'Mouse', 'Monitor', 'Teclado'],
+            datasets: [{
+                data: [40, 25, 20, 15],
+                backgroundColor: ['#0d6efd', '#198754', '#ffc107', '#dc3545']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+</script>
+
+<!-- Tarjetas de resumen -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Usuarios</h5>
+                <h2>1,240</h2>
+                <p class="mb-0">↑ 12% este mes</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Ventas</h5>
+                <h2>$8,540</h2>
+                <p class="mb-0">↑ 8% este mes</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5 class="card-title">Pedidos</h5>
+                <h2>340</h2>
+                <p class="mb-0">↓ 3% este mes</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-danger">
+            <div class="card-body">
+                <h5 class="card-title">Errores</h5>
+                <h2>12</h2>
+                <p class="mb-0">↑ 2% este mes</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla de últimos pedidos -->
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Últimos Pedidos</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Cliente</th>
+                            <th>Producto</th>
+                            <th>Estado</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>001</td>
+                            <td>Juan Pérez</td>
+                            <td>Laptop</td>
+                            <td><span class="badge bg-success">Entregado</span></td>
+                            <td>$1,200</td>
+                        </tr>
+                        <tr>
+                            <td>002</td>
+                            <td>María López</td>
+                            <td>Mouse</td>
+                            <td><span class="badge bg-warning">Pendiente</span></td>
+                            <td>$25</td>
+                        </tr>
+                        <tr>
+                            <td>003</td>
+                            <td>Carlos Ruiz</td>
+                            <td>Monitor</td>
+                            <td><span class="badge bg-danger">Cancelado</span></td>
+                            <td>$350</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel lateral -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Actividad Reciente</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">👤 Nuevo usuario registrado</li>
+                    <li class="list-group-item">🛒 Pedido #004 creado</li>
+                    <li class="list-group-item">✅ Pedido #001 entregado</li>
+                    <li class="list-group-item">⚠️ Error en pago #003</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

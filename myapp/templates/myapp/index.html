@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ECCI – Plataforma Académica</title>
+  <style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--color-background-tertiary);color:var(--color-text-primary);font-size:15px}
+.app{display:flex;min-height:100vh;flex-direction:column}
+.topbar{background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:100}
+.logo{font-size:15px;font-weight:500;color:#185FA5}
+.logo span{color:var(--color-text-secondary);font-weight:400}
+.user-badge{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--color-text-secondary)}
+.avatar{width:30px;height:30px;border-radius:50%;background:#E6F1FB;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#185FA5}
+.layout{display:flex;flex:1}
+.sidebar{width:200px;background:var(--color-background-primary);border-right:0.5px solid var(--color-border-tertiary);padding:1rem 0;flex-shrink:0}
+.nav-section{font-size:11px;color:var(--color-text-tertiary);padding:0.5rem 1rem 0.25rem;text-transform:uppercase;letter-spacing:0.05em;font-weight:500}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 1rem;font-size:13px;cursor:pointer;color:var(--color-text-secondary);border-left:2px solid transparent;transition:all 0.1s}
+.nav-item:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
+.nav-item.active{background:#E6F1FB;color:#185FA5;border-left-color:#185FA5;font-weight:500}
+.nav-icon{width:16px;height:16px;opacity:0.7;font-size:14px}
+.main{flex:1;padding:1.5rem;overflow:auto}
+.page{display:none}
+.page.active{display:block}
+.page-header{margin-bottom:1.5rem}
+.page-header h2{font-size:18px;font-weight:500;margin-bottom:4px}
+.page-header p{font-size:13px;color:var(--color-text-secondary)}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem;margin-bottom:1rem}
+.card-title{font-size:14px;font-weight:500;margin-bottom:1rem;color:var(--color-text-primary)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.form-row.cols3{grid-template-columns:1fr 1fr 1fr}
+.form-row.single{grid-template-columns:1fr}
+.form-group{display:flex;flex-direction:column;gap:4px}
+label{font-size:12px;color:var(--color-text-secondary);font-weight:500}
+input,select,textarea{width:100%;padding:8px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);font-size:13px;font-family:var(--font-sans)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#378ADD;box-shadow:0 0 0 2px rgba(55,138,221,0.15)}
+.error-msg{font-size:11px;color:#A32D2D;display:none}
+.error-msg.show{display:block}
+input.error{border-color:#E24B4A}
+.btn{padding:8px 16px;border-radius:var(--border-radius-md);font-size:13px;font-weight:500;cursor:pointer;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);transition:all 0.1s}
+.btn:hover{background:var(--color-background-secondary)}
+.btn.primary{background:#185FA5;color:#fff;border-color:#185FA5}
+.btn.primary:hover{background:#0C447C}
+.btn.danger{background:#A32D2D;color:#fff;border-color:#A32D2D}
+.btn.success{background:#3B6D11;color:#fff;border-color:#3B6D11}
+.btn-row{display:flex;gap:8px;margin-top:1rem;justify-content:flex-end}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px 10px;font-weight:500;font-size:12px;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary)}
+td{padding:8px 10px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--color-background-secondary)}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--border-radius-md);font-size:11px;font-weight:500}
+.badge.green{background:#EAF3DE;color:#27500A}
+.badge.red{background:#FCEBEB;color:#791F1F}
+.badge.amber{background:#FAEEDA;color:#633806}
+.badge.blue{background:#E6F1FB;color:#0C447C}
+.alert{padding:10px 14px;border-radius:var(--border-radius-md);font-size:13px;margin-bottom:1rem;display:none}
+.alert.show{display:block}
+.alert.success{background:#EAF3DE;color:#27500A;border:0.5px solid #C0DD97}
+.alert.error{background:#FCEBEB;color:#791F1F;border:0.5px solid #F7C1C1}
+.alert.info{background:#E6F1FB;color:#0C447C;border:0.5px solid #B5D4F4}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem}
+.stat-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem}
+.stat-label{font-size:12px;color:var(--color-text-secondary);margin-bottom:4px}
+.stat-val{font-size:22px;font-weight:500}
+.nota-input{width:60px;text-align:center}
+.asistencia-grid{display:grid;grid-template-columns:repeat(auto-fill,60px);gap:6px;margin-top:8px}
+.dia-btn{width:54px;height:44px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);cursor:pointer;font-size:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:var(--color-background-primary);transition:all 0.1s}
+.dia-btn.presente{background:#EAF3DE;border-color:#C0DD97;color:#27500A}
+.dia-btn.ausente{background:#FCEBEB;border-color:#F7C1C1;color:#791F1F}
+.dia-btn.justificado{background:#FAEEDA;border-color:#FAC775;color:#633806}
+.dia-num{font-size:13px;font-weight:500}
+.dia-est{font-size:10px}
+.legend{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--color-text-secondary)}
+.legend-dot{width:10px;height:10px;border-radius:50%}
+.tabs{display:flex;gap:0;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:1.5rem}
+.tab{padding:8px 16px;font-size:13px;cursor:pointer;color:var(--color-text-secondary);border-bottom:2px solid transparent;margin-bottom:-0.5px}
+.tab.active{color:#185FA5;border-bottom-color:#185FA5;font-weight:500}
+.progress-bar{height:6px;background:var(--color-background-secondary);border-radius:3px;overflow:hidden;margin-top:4px}
+.progress-fill{height:100%;border-radius:3px;transition:width 0.3s}
+.nota-display{font-size:15px;font-weight:500}
+.nota-display.aprobado{color:#3B6D11}
+.nota-display.reprobado{color:#A32D2D}
+.nota-display.riesgo{color:#854F0B}
+</style>
+</head>
+<body>
+
+  <div class="app">
+  <div class="topbar">
+    <div class="logo">ECCI — <span>Plataforma Académica · Institución Icononzo, Tolima</span></div>
+    <div class="user-badge"><div class="avatar">MA</div> María Arias · Docente</div>
+  </div>
+  <div class="layout">
+    <div class="sidebar">
+      <div class="nav-section">Menú principal</div>
+      <div class="nav-item active" onclick="showPage('inicio')">📊 <span>Inicio</span></div>
+      <div class="nav-section">Gestión</div>
+      <div class="nav-item" onclick="showPage('asistencia')">📋 <span>Asistencia</span></div>
+      <div class="nav-item" onclick="showPage('calificaciones')">📝 <span>Calificaciones</span></div>
+      <div class="nav-item" onclick="showPage('promedios')">🧮 <span>Promedios</span></div>
+      <div class="nav-section">Reportes</div>
+      <div class="nav-item" onclick="showPage('reporte')">📄 <span>Reporte final</span></div>
+    </div>
+    <div class="main">
+
+      <div class="page active" id="page-inicio">
+        <div class="page-header"><h2>Panel de control</h2><p>Resumen del período académico · 2026-1</p></div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-label">Estudiantes</div><div class="stat-val">28</div></div>
+          <div class="stat-card"><div class="stat-label">Asistencia promedio</div><div class="stat-val" id="stat-asistencia">87%</div></div>
+          <div class="stat-card"><div class="stat-label">Promedio general</div><div class="stat-val" id="stat-promedio">—</div></div>
+          <div class="stat-card"><div class="stat-label">En riesgo</div><div class="stat-val" id="stat-riesgo">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Accesos rápidos</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn primary" onclick="showPage('asistencia')">Registrar asistencia</button>
+            <button class="btn primary" onclick="showPage('calificaciones')">Ingresar notas</button>
+            <button class="btn" onclick="showPage('promedios')">Ver promedios</button>
+            <button class="btn" onclick="showPage('reporte')">Generar reporte</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Estudiantes con bajo rendimiento</div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Estudiante</th><th>Promedio</th><th>Asistencia</th><th>Estado</th></tr></thead>
+            <tbody id="tabla-riesgo"><tr><td colspan="4" style="color:var(--color-text-tertiary);text-align:center">No hay datos registrados aún.</td></tr></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <div class="page" id="page-asistencia">
+        <div class="page-header"><h2>Registro de asistencia</h2><p>Marque la asistencia diaria. Los datos se validan antes de guardar.</p></div>
+        <div class="alert info show" id="alert-asist-info">ℹ️ Seleccione un curso y fecha para habilitar el registro.</div>
+        <div class="alert success" id="alert-asist-ok">✅ Asistencia guardada correctamente.</div>
+        <div class="alert error" id="alert-asist-err"></div>
+        <div class="card">
+          <div class="card-title">Parámetros de clase</div>
+          <div class="form-row cols3">
+            <div class="form-group">
+              <label>Curso *</label>
+              <select id="asist-curso" onchange="habilitarAsistencia()">
+                <option value="">— Seleccione —</option>
+                <option>9° A</option><option>9° B</option><option>10° A</option><option>11° A</option>
+              </select>
+              <span class="error-msg" id="err-asist-curso">Seleccione un curso.</span>
+            </div>
+            <div class="form-group">
+              <label>Materia *</label>
+              <select id="asist-materia" onchange="habilitarAsistencia()">
+                <option value="">— Seleccione —</option>
+                <option>Matemáticas</option><option>Español</option><option>Ciencias</option><option>Historia</option>
+              </select>
+              <span class="error-msg" id="err-asist-materia">Seleccione una materia.</span>
+            </div>
+            <div class="form-group">
+              <label>Fecha *</label>
+              <input type="date" id="asist-fecha" onchange="habilitarAsistencia()" />
+              <span class="error-msg" id="err-asist-fecha">Fecha requerida.</span>
+            </div>
+          </div>
+        </div>
+        <div class="card" id="card-lista-asist" style="opacity:0.4;pointer-events:none">
+          <div class="card-title">Lista de estudiantes</div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Estudiante</th><th>Estado</th><th>Observación</th></tr></thead>
+            <tbody id="tabla-asistencia"></tbody>
+          </table></div>
+          <div class="btn-row">
+            <button class="btn" onclick="marcarTodos('P')">Todos presentes</button>
+            <button class="btn" onclick="marcarTodos('A')">Todos ausentes</button>
+            <button class="btn primary" onclick="guardarAsistencia()">Guardar registro</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-calificaciones">
+        <div class="page-header"><h2>Ingreso de calificaciones</h2><p>Notas en escala 0.0 – 5.0. El sistema valida rangos y formatos automáticamente.</p></div>
+        <div class="alert success" id="alert-notas-ok">✅ Calificaciones guardadas. Promedios actualizados.</div>
+        <div class="alert error" id="alert-notas-err"></div>
+        <div class="card">
+          <div class="form-row cols3">
+            <div class="form-group">
+              <label>Curso *</label>
+              <select id="notas-curso" onchange="cargarTablaNotas()">
+                <option value="">— Seleccione —</option>
+                <option>9° A</option><option>9° B</option><option>10° A</option><option>11° A</option>
+              </select>
+              <span class="error-msg" id="err-notas-curso">Seleccione un curso.</span>
+            </div>
+            <div class="form-group">
+              <label>Materia *</label>
+              <select id="notas-materia" onchange="cargarTablaNotas()">
+                <option value="">— Seleccione —</option>
+                <option>Matemáticas</option><option>Español</option><option>Ciencias</option><option>Historia</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Período *</label>
+              <select id="notas-periodo" onchange="cargarTablaNotas()">
+                <option value="">— Seleccione —</option>
+                <option>Período 1</option><option>Período 2</option><option>Período 3</option><option>Período 4</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="card" id="card-notas">
+          <div class="card-title">Notas por actividad</div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Estudiante</th><th>Act. 1 (20%)</th><th>Act. 2 (20%)</th><th>Parcial (30%)</th><th>Final (30%)</th><th>Promedio</th></tr></thead>
+            <tbody id="tabla-notas"></tbody>
+          </table></div>
+          <div class="btn-row">
+            <button class="btn" onclick="autorellenarNotas()">Autorellenar (prueba)</button>
+            <button class="btn primary" onclick="guardarNotas()">Guardar calificaciones</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-promedios">
+        <div class="page-header"><h2>Cálculo de promedios</h2><p>Validación de exactitud matemática por estudiante.</p></div>
+        <div class="card">
+          <div class="card-title">Simulador de cálculo</div>
+          <div class="form-row cols3">
+            <div class="form-group"><label>Actividad 1 (20%)</label><input type="number" id="p-act1" min="0" max="5" step="0.1" placeholder="0.0 – 5.0" oninput="calcularPromedio()" /></div>
+            <div class="form-group"><label>Actividad 2 (20%)</label><input type="number" id="p-act2" min="0" max="5" step="0.1" placeholder="0.0 – 5.0" oninput="calcularPromedio()" /></div>
+            <div class="form-group"><label>Parcial (30%)</label><input type="number" id="p-parc" min="0" max="5" step="0.1" placeholder="0.0 – 5.0" oninput="calcularPromedio()" /></div>
+          </div>
+          <div class="form-row" style="grid-template-columns:1fr auto">
+            <div class="form-group"><label>Final (30%)</label><input type="number" id="p-final" min="0" max="5" step="0.1" placeholder="0.0 – 5.0" oninput="calcularPromedio()" /></div>
+            <div style="display:flex;align-items:flex-end;padding-bottom:1px">
+              <div style="background:var(--color-background-secondary);padding:10px 20px;border-radius:var(--border-radius-md);text-align:center">
+                <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:2px">Promedio calculado</div>
+                <div id="prom-resultado" class="nota-display" style="font-size:24px">—</div>
+              </div>
+            </div>
+          </div>
+          <div id="prom-detalle" style="font-size:12px;color:var(--color-text-secondary);margin-top:8px"></div>
+          <div id="prom-alerta" class="alert" style="margin-top:10px"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Promedios registrados</div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Estudiante</th><th>Mat.</th><th>Esp.</th><th>Cs.</th><th>His.</th><th>Promedio general</th><th>Estado</th></tr></thead>
+            <tbody id="tabla-promedios"><tr><td colspan="7" style="color:var(--color-text-tertiary);text-align:center">Guarde calificaciones para ver promedios.</td></tr></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <div class="page" id="page-reporte">
+        <div class="page-header"><h2>Reporte académico final</h2><p>Consolidado de asistencia y calificaciones del período.</p></div>
+        <div class="card">
+          <div class="form-row">
+            <div class="form-group"><label>Período</label>
+              <select id="rep-periodo"><option>Período 1</option><option>Período 2</option><option>Período 3</option><option>Período 4</option></select>
+            </div>
+            <div class="form-group"><label>Curso</label>
+              <select id="rep-curso"><option>Todos</option><option>9° A</option><option>9° B</option><option>10° A</option><option>11° A</option></select>
+            </div>
+          </div>
+          <div class="btn-row" style="justify-content:flex-start">
+            <button class="btn primary" onclick="generarReporte()">Generar reporte</button>
+          </div>
+        </div>
+        <div id="reporte-contenido"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+  <script>
+  // --- PROTECCIÓN DE RUTA ---
+// Si no existe la sesión en el navegador, lo mandamos de vuelta al login
+if (localStorage.getItem('sesionIniciada') !== 'true') {
+    window.location.href = 'login.html';
+}
+
+// Función para Cerrar Sesión (puedes llamarla desde un botón si quieres)
+function cerrarSesion() {
+    localStorage.removeItem('sesionIniciada');
+    localStorage.removeItem('nombreUsuario');
+    window.location.href = 'login.html';
+}
+const ESTUDIANTES = ["Ana Torres","Carlos Mora","Diana Ríos","Felipe Gómez","Laura Cano","Martín Peña","Sara López","David Silva","Valentina Cruz","Andrés Vargas","Camila Rojas","Nicolás Díaz"];
+const MATERIAS = ["Matemáticas","Español","Ciencias","Historia"];
+let asistencias = {};
+let calificaciones = {};
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  // Ajustado el navMap sin la opción de estrés
+  const navMap={inicio:0,asistencia:1,calificaciones:2,promedios:3,reporte:4};
+  document.querySelectorAll('.nav-item')[navMap[id]]?.classList.add('active');
+  if(id==='calificaciones') cargarTablaNotas();
+  if(id==='promedios') actualizarTablaPromedios();
+}
+
+function showAlert(id,show,msg){
+  const el=document.getElementById(id);
+  if(!el)return;
+  if(msg) el.textContent=msg;
+  el.classList.toggle('show',show);
+}
+
+// --- ASISTENCIA ---
+function habilitarAsistencia(){
+  const curso=document.getElementById('asist-curso').value;
+  const mat=document.getElementById('asist-materia').value;
+  const fecha=document.getElementById('asist-fecha').value;
+  const card=document.getElementById('card-lista-asist');
+  showAlert('alert-asist-info',!curso||!mat||!fecha);
+  if(curso&&mat&&fecha){
+    card.style.opacity='1';card.style.pointerEvents='auto';
+    renderTablaAsistencia(curso,mat,fecha);
+  }
+  validarFecha(fecha);
+}
+
+function validarFecha(fecha){
+  const err=document.getElementById('err-asist-fecha');
+  if(!fecha){err.classList.add('show');return false;}
+  const d=new Date(fecha);
+  const hoy=new Date();
+  if(d>hoy){err.textContent='La fecha no puede ser futura.';err.classList.add('show');return false;}
+  err.classList.remove('show');return true;
+}
+
+function renderTablaAsistencia(curso,mat,fecha){
+  const key=`${curso}|${mat}|${fecha}`;
+  const saved=asistencias[key]||{};
+  const tbody=document.getElementById('tabla-asistencia');
+  tbody.innerHTML=ESTUDIANTES.map((est,i)=>{
+    const estado=saved[i]||'P';
+    return `<tr>
+      <td>${est}</td>
+      <td>
+        <select onchange="updateAsist('${key}',${i},this.value)" style="width:140px">
+          <option value="P" ${estado==='P'?'selected':''}>✅ Presente</option>
+          <option value="A" ${estado==='A'?'selected':''}>❌ Ausente</option>
+          <option value="J" ${estado==='J'?'selected':''}>📄 Justificado</option>
+        </select>
+      </td>
+      <td><input type="text" placeholder="Observación opcional" style="width:200px" /></td>
+    </tr>`;
+  }).join('');
+  if(!asistencias[key]) asistencias[key]={};
+  ESTUDIANTES.forEach((_,i)=>{if(!asistencias[key][i])asistencias[key][i]='P';});
+}
+
+function updateAsist(key,i,val){asistencias[key][i]=val;}
+function marcarTodos(val){
+  const curso=document.getElementById('asist-curso').value;
+  const mat=document.getElementById('asist-materia').value;
+  const fecha=document.getElementById('asist-fecha').value;
+  const key=`${curso}|${mat}|${fecha}`;
+  document.querySelectorAll('#tabla-asistencia select').forEach((sel,i)=>{sel.value=val;asistencias[key][i]=val;});
+}
+
+function guardarAsistencia(){
+  const curso=document.getElementById('asist-curso').value;
+  const mat=document.getElementById('asist-materia').value;
+  const fecha=document.getElementById('asist-fecha').value;
+  let ok=true;
+  if(!curso){document.getElementById('err-asist-curso').classList.add('show');ok=false;}else{document.getElementById('err-asist-curso').classList.remove('show');}
+  if(!mat){document.getElementById('err-asist-materia').classList.add('show');ok=false;}else{document.getElementById('err-asist-materia').classList.remove('show');}
+  if(!validarFecha(fecha)) ok=false;
+  if(!ok){showAlert('alert-asist-err',true,'⚠️ Corrija los errores antes de guardar.');return;}
+  showAlert('alert-asist-err',false);
+  showAlert('alert-asist-ok',true);
+  setTimeout(()=>showAlert('alert-asist-ok',false),3000);
+  actualizarEstadisticas();
+}
+
+// --- CALIFICACIONES ---
+function cargarTablaNotas(){
+  const curso=document.getElementById('notas-curso').value;
+  if(!curso) return;
+  const key=`${curso}`;
+  if(!calificaciones[key]) calificaciones[key]={};
+  const tbody=document.getElementById('tabla-notas');
+  tbody.innerHTML=ESTUDIANTES.map((est,i)=>{
+    const n=calificaciones[key][i]||{a1:'',a2:'',parc:'',final:''};
+    return `<tr>
+      <td>${est}</td>
+      <td><input type="number" class="nota-input" min="0" max="5" step="0.1" value="${n.a1}" placeholder="—" 
+        oninput="actualizarFilaNota('${key}',${i},'a1',this)" /></td>
+      <td><input type="number" class="nota-input" min="0" max="5" step="0.1" value="${n.a2}" placeholder="—"
+        oninput="actualizarFilaNota('${key}',${i},'a2',this)" /></td>
+      <td><input type="number" class="nota-input" min="0" max="5" step="0.1" value="${n.parc}" placeholder="—"
+        oninput="actualizarFilaNota('${key}',${i},'parc',this)" /></td>
+      <td><input type="number" class="nota-input" min="0" max="5" step="0.1" value="${n.final}" placeholder="—"
+        oninput="actualizarFilaNota('${key}',${i},'final',this)" /></td>
+      <td id="prom-nota-${i}">—</td>
+    </tr>`;
+  }).join('');
+  ESTUDIANTES.forEach((_,i)=>recalcFila(key,i));
+}
+
+function validarNota(val){
+  if(val===''||val===null) return {ok:true,msg:''};
+  const n=parseFloat(val);
+  if(isNaN(n)) return {ok:false,msg:'No es un número'};
+  if(n<0) return {ok:false,msg:'Mínimo 0.0'};
+  if(n>5) return {ok:false,msg:'Máximo 5.0'};
+  return {ok:true,msg:''};
+}
+
+function actualizarFilaNota(key,i,campo,input){
+  const v=validarNota(input.value);
+  if(!v.ok){input.classList.add('error');}
+  else{input.classList.remove('error');if(!calificaciones[key])calificaciones[key]={};if(!calificaciones[key][i])calificaciones[key][i]={};calificaciones[key][i][campo]=parseFloat(input.value)||'';}
+  recalcFila(key,i);
+}
+
+function recalcFila(key,i){
+  const n=calificaciones[key]?.[i]||{};
+  const cell=document.getElementById(`prom-nota-${i}`);
+  if(!cell) return;
+  if([n.a1,n.a2,n.parc,n.final].every(x=>x!==''&&x!==undefined)){
+    const p=(n.a1*0.2+n.a2*0.2+n.parc*0.3+n.final*0.3);
+    const pf=Math.round(p*10)/10;
+    let cls='aprobado';
+    if(pf<3.0) cls='reprobado';
+    else if(pf<3.5) cls='riesgo';
+    cell.innerHTML=`<span class="nota-display ${cls}">${pf.toFixed(1)}</span>`;
+  } else { cell.textContent='—'; }
+}
+
+function autorellenarNotas(){
+  const curso=document.getElementById('notas-curso').value;
+  if(!curso){showAlert('alert-notas-err',true,'Seleccione un curso primero.');return;}
+  const key=curso;
+  if(!calificaciones[key])calificaciones[key]={};
+  ESTUDIANTES.forEach((_,i)=>{
+    calificaciones[key][i]={
+      a1:+(Math.random()*2+3).toFixed(1),
+      a2:+(Math.random()*2+2.5).toFixed(1),
+      parc:+(Math.random()*2+2.5).toFixed(1),
+      final:+(Math.random()*2+3).toFixed(1)
+    };
+  });
+  cargarTablaNotas();
+}
+
+function guardarNotas(){
+  const curso=document.getElementById('notas-curso').value;
+  const mat=document.getElementById('notas-materia').value;
+  const periodo=document.getElementById('notas-periodo').value;
+  if(!curso){showAlert('alert-notas-err',true,'⚠️ Seleccione un curso.');document.getElementById('err-notas-curso').classList.add('show');return;}
+  let hayErrores=document.querySelectorAll('#tabla-notas input.error').length>0;
+  if(hayErrores){showAlert('alert-notas-err',true,'⚠️ Hay notas con valores inválidos. Corrija antes de guardar.');return;}
+  showAlert('alert-notas-err',false);
+  showAlert('alert-notas-ok',true);
+  setTimeout(()=>showAlert('alert-notas-ok',false),3000);
+  actualizarEstadisticas();
+}
+
+// --- PROMEDIOS ---
+function calcularPromedio(){
+  const a1=parseFloat(document.getElementById('p-act1').value);
+  const a2=parseFloat(document.getElementById('p-act2').value);
+  const parc=parseFloat(document.getElementById('p-parc').value);
+  const final=parseFloat(document.getElementById('p-final').value);
+  const res=document.getElementById('prom-resultado');
+  const det=document.getElementById('prom-detalle');
+  const alr=document.getElementById('prom-alerta');
+  alr.classList.remove('show','success','error','info');
+  const vals=[a1,a2,parc,final];
+  const invalidos=vals.filter(v=>!isNaN(v)&&(v<0||v>5));
+  if(invalidos.length>0){
+    res.textContent='Error';res.className='nota-display reprobado';
+    det.textContent='';
+    alr.textContent='⚠️ Una o más notas están fuera del rango 0.0 – 5.0';
+    alr.className='alert error show';
+    return;
+  }
+  if(vals.some(isNaN)){res.textContent='—';res.className='nota-display';det.textContent='';return;}
+  const p=a1*0.2+a2*0.2+parc*0.3+final*0.3;
+  const pf=Math.round(p*100)/100;
+  let cls='aprobado',estadoTxt='Aprobado';
+  if(pf<3.0){cls='reprobado';estadoTxt='Reprobado';}
+  else if(pf<3.5){cls='riesgo';estadoTxt='En riesgo';}
+  res.textContent=pf.toFixed(2);res.className='nota-display '+cls;
+  det.innerHTML=`Fórmula: (${a1.toFixed(1)}×0.2) + (${a2.toFixed(1)}×0.2) + (${parc.toFixed(1)}×0.3) + (${final.toFixed(1)}×0.3) = <strong>${pf.toFixed(2)}</strong> · ${estadoTxt}`;
+  alr.textContent=pf<3.0?'❌ Nota reprobatoria. El estudiante debe recuperar.':pf<3.5?'⚠️ Nota en riesgo. Se recomienda nivelación.':'✅ Nota aprobatoria.';
+  alr.className=`alert ${pf<3.0?'error':pf<3.5?'info':'success'} show`;
+}
+
+function actualizarTablaPromedios(){
+  const tbody=document.getElementById('tabla-promedios');
+  const cursos=['9° A','9° B','10° A','11° A'];
+  let filas='', enRiesgo=0, sumProm=0, cnt=0;
+  ESTUDIANTES.forEach((est,i)=>{
+    let notas=[];
+    cursos.forEach(c=>{
+      const n=calificaciones[c]?.[i];
+      if(n&&[n.a1,n.a2,n.parc,n.final].every(x=>x!==''&&x!==undefined)){
+        notas.push(+(n.a1*0.2+n.a2*0.2+n.parc*0.3+n.final*0.3).toFixed(2));
+      }
+    });
+    if(!notas.length) return;
+    const pg=notas.reduce((a,b)=>a+b,0)/notas.length;
+    const pgf=Math.round(pg*100)/100;
+    sumProm+=pgf;cnt++;
+    if(pgf<3.5)enRiesgo++;
+    const cls=pgf<3.0?'red':pgf<3.5?'amber':'green';
+    const est2=pgf<3.0?'Reprobado':pgf<3.5?'En riesgo':'Aprobado';
+    filas+=`<tr><td>${est}</td><td>—</td><td>—</td><td>—</td><td>—</td><td><strong>${pgf.toFixed(2)}</strong></td><td><span class="badge ${cls}">${est2}</span></td></tr>`;
+  });
+  tbody.innerHTML=filas||'<tr><td colspan="7" style="color:var(--color-text-tertiary);text-align:center">Guarde calificaciones para ver promedios.</td></tr>';
+  document.getElementById('stat-riesgo').textContent=enRiesgo;
+  if(cnt>0)document.getElementById('stat-promedio').textContent=(sumProm/cnt).toFixed(2);
+}
+
+function actualizarEstadisticas(){actualizarTablaPromedios();}
+
+// --- REPORTE ---
+function generarReporte(){
+  const periodo=document.getElementById('rep-periodo').value;
+  const curso=document.getElementById('rep-curso').value;
+  const div=document.getElementById('reporte-contenido');
+  const fecha=new Date().toLocaleDateString('es-CO');
+  div.innerHTML=`<div class="card">
+    <div class="card-title">Reporte académico · ${periodo} · ${curso} · ${fecha}</div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Estudiante</th><th>Promedio</th><th>Asistencia</th><th>Estado</th><th>Observación</th></tr></thead>
+      <tbody>${ESTUDIANTES.slice(0,8).map(est=>{
+        const p=(Math.random()*2+2.8).toFixed(2);
+        const a=Math.round(75+Math.random()*25);
+        const cls=p<3?'red':p<3.5?'amber':'green';
+        const est2=p<3?'Reprobado':p<3.5?'En riesgo':'Aprobado';
+        return `<tr><td>${est}</td><td>${p}</td><td>${a}%</td><td><span class="badge ${cls}">${est2}</span></td><td style="color:var(--color-text-tertiary);font-size:12px">—</td></tr>`;
+      }).join('')}</tbody>
+    </table></div>
+    <div class="btn-row"><button class="btn" onclick="alert('PDF generado (simulado)')">📥 Exportar PDF</button><button class="btn" onclick="alert('Excel generado (simulado)')">📊 Exportar Excel</button></div>
+  </div>`;
+}
+
+// init tabla asistencia
+(function(){
+  const tbody=document.getElementById('tabla-asistencia');
+  tbody.innerHTML=ESTUDIANTES.map((est,i)=>`<tr>
+    <td>${est}</td>
+    <td><select style="width:140px"><option value="P">✅ Presente</option><option value="A">❌ Ausente</option><option value="J">📄 Justificado</option></select></td>
+    <td><input type="text" placeholder="Observación opcional" style="width:200px" /></td>
+  </tr>`).join('');
+  document.getElementById('asist-fecha').value=new Date().toISOString().split('T')[0];
+})();
+</script>
+</body>
+</html>
